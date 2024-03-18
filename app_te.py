@@ -30,8 +30,51 @@ class TEApp(NetworkApp):
     #       self.max_bandwidth_obj
     def from_json(self):
         with open('%s'% self.json_file) as f:
-            # TODO: complete
-            pass
+            te_objectives = json.load(f)
+            if 'pass_by_paths' in te_objectives:
+                pass_by_paths = te_objectives['pass_by_paths']
+                for objective_data in pass_by_paths:
+                    match_pattern_data = objective_data['match_pattern']
+                    match_pattern = MatchPattern(
+                        src_mac = match_pattern_data.get('src_mac'),
+                        dst_mac = match_pattern_data.get('dst_mac'),
+                        mac_proto = match_pattern_data.get('mac_proto'),
+                        ip_proto = match_pattern_data.get('ip_proto'),
+                        src_ip = match_pattern_data.get('src_ip'),
+                        dst_ip = match_pattern_data.get('dst_ip'),
+                        src_port = match_pattern_data.get('src_port'),
+                        dst_port = match_pattern_data.get('dst_port'),
+                        in_port = match_pattern_data.get('in_port')
+                    )
+                    pass_by_obj = PassByPathObjective(
+                        match_pattern = match_pattern,
+                        switches = objective_data['switches'],
+                        symmetric = objective_data['symmetric']
+                    )
+                    self.add_pass_by_path_obj(pass_by_obj)
+
+            if 'min_latency' in te_objectives:
+                min_latency = te_objectives['min_latency']
+                for objective_data in min_latency:
+                    match_pattern_data = objective_data['match_pattern']
+                    match_pattern = MatchPattern(
+                        src_mac = match_pattern_data.get('src_mac'),
+                        dst_mac = match_pattern_data.get('dst_mac'),
+                        mac_proto = match_pattern_data.get('mac_proto'),
+                        ip_proto = match_pattern_data.get('ip_proto'),
+                        src_ip = match_pattern_data.get('src_ip'),
+                        dst_ip = match_pattern_data.get('dst_ip'),
+                        src_port = match_pattern_data.get('src_port'),
+                        dst_port = match_pattern_data.get('dst_port'),
+                        in_port = match_pattern_data.get('in_port')
+                    )
+                    min_lat_obj = MinLatencyObjective(
+                        match_pattern = match_pattern,
+                        src_switch = objective_data['src_switch'],
+                        dst_switch = objective_data['dst_switch'],
+                        symmetric = objective_data['symmetric']
+                    )
+                    self.add_min_latency_obj(min_lat_obj)
     
     # Translates the TE objectives to the `json_file`
     def to_json(self, json_file):
